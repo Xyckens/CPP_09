@@ -3,15 +3,18 @@
 
 #include <iostream>
 #include <algorithm>
-#include <algorithm>
-#include <set>
+#include <string>
+#include <map>
 #include <sstream>
+#include <fstream>
 
 class BitcoinExchange
 {
 private:
-	std::multiset<std::string, float> data_csv;
-	std::multiset<std::string, float> input_txt;
+	std::multimap<float, float> data_csv;
+	std::multimap<float, float> input_txt;
+	float						data;
+
 	BitcoinExchange();
 	BitcoinExchange(BitcoinExchange const &other);
 	BitcoinExchange &operator=(BitcoinExchange const &other);
@@ -19,38 +22,17 @@ public:
 	BitcoinExchange(std::string data, std::string input);
 	~BitcoinExchange();
 	bool	validate_date(std::string &date);
-	bool	validate_values(float value);
+	bool	validate_value(float value);
+	void	validate_entry_csv(std::string line);
+	void	validate_entry_txt(std::string line);
+	void	find_nearest_date(std::string date, float value);
 
 
-	class NoFileException : public std::exception
-	{
-	public:
-		const char* what() const throw();
-	};
-
-	class EmptyFileException : public std::exception
-	{
-	public:
-		const char* what() const throw();
-	};
-
-	class InvalidDateException : public std::exception
-	{
-	public:
-		const char* what() const throw();
-	};
-
-	class InvalidFormatException : public std::exception
-	{
-	public:
-		const char* what() const throw();
-	};
-
-	class InvalidValueException : public std::exception
-	{
-	public:
-		const char* what() const throw();
-	};
+	const char * NoFileException();
+	const char * EmptyFileException();
+	const char * InvalidDateException();
+	const char * InvalidFormatException();
+	const char * InvalidValueException();
 };
 
 
