@@ -44,7 +44,7 @@ BitcoinExchange::BitcoinExchange(std::string data, std::string input)
 	std::getline(file2, line);
 	if (line != "date | value")
 	{
-		std::cerr << InvalidFormatException() << std::endl;
+		std::cerr << InvalidFormatException() << " => " << line << std::endl;
 		return ;
 	}
 	while (std::getline(file2, line))
@@ -92,16 +92,35 @@ void	BitcoinExchange::validate_entry_csv(std::string line)
 	unsigned long	pos = line.find(",");
 	if (pos != 10 || pos + 1 >= line.length())
 	{
-		std::cout << InvalidFormatException() << std::endl;
+		std::cout << InvalidFormatException() << " => " << line << std::endl;
 		return ;
 	}
+
 	std::string	date = line.substr(0, pos);
 	if (!validate_date(date))
 	{
 		std::cout << InvalidDateException() << " => " << date << std::endl;
 		return ;
 	}
-	float	value = static_cast<float>(atof(line.substr(pos + 1).c_str()));
+
+	std::string v = line.substr(pos + 1);
+	int			p = 0; //ponto
+	unsigned long i = 0;
+	for (; i < v.length(); i++)
+	{
+		if (v[i] == '.')
+			p++;
+		else if ((v[i] == '+' || v[i] == '-') && i > 0)
+			break ;
+		else if ((v[i] < '0' || v[i] > '9') && v[i] != '-' && v[i] != '+')
+			break ;
+	}
+	if (i < v.length() || p > 1)
+	{
+		std::cout << InvalidValueException() << " => " << v << std::endl;
+		return ;
+	}
+	float	value = static_cast<float>(atof(v.c_str()));
 	data_csv.insert(std::pair<float, float>(this->data, value));
 }
 
@@ -110,8 +129,7 @@ void	BitcoinExchange::validate_entry_txt(std::string line)
 	unsigned long	pos = line.find(" | ");
 	if (pos != 10 || pos + 3 >= line.length())
 	{
-		std::cout << "ola\n";
-		std::cout << InvalidFormatException() << std::endl;
+		std::cout << InvalidFormatException() << " => " << line << std::endl;
 		return ;
 	}
 	std::string	date = line.substr(0, pos);
