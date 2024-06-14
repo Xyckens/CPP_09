@@ -47,6 +47,10 @@
 		"typeinfo": "cpp",
 		"sstream": "cpp",
 		"map": "cpp",
-		"fstream": "cpp"
+		"fstream": "cpp",
+		"chrono": "cpp",
+		"ctime": "cpp",
+		"list": "cpp",
+		"ratio": "cpp"
 	}
 }
