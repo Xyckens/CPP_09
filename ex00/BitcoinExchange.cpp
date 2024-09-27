@@ -11,13 +11,11 @@ BitcoinExchange::BitcoinExchange()
 BitcoinExchange::BitcoinExchange(BitcoinExchange const &other)
 {
 	data_csv = other.data_csv;
-	input_txt = other.input_txt;
 }
 
 BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange const &other)
 {
 	data_csv = other.data_csv;
-	input_txt = other.input_txt;
 	return (*this);
 }
 
@@ -44,15 +42,18 @@ BitcoinExchange::BitcoinExchange(std::string data, std::string input)
 	std::getline(file2, line);
 	if (line != "date | value")
 	{
-		std::cerr << InvalidFormatException() << " => " << line << std::endl;
-		return ;
+		if (!validate_entry_txt(line))
+		{
+			std::cerr << InvalidFormatException() << " => " << line << std::endl;
+			return ;
+		}
 	}
 	while (std::getline(file2, line))
 		validate_entry_txt(line);
 	file2.close();
 }
 
-bool	BitcoinExchange::validate_date(std::string &date)
+bool	BitcoinExchange::validate_date(std::string date)
 {
 	if (date.size() != 10 || date[4] != '-' || date[7] != '-')
 		return false;
@@ -76,11 +77,12 @@ bool	BitcoinExchange::validate_date(std::string &date)
     std::string month2 = date.substr(5, 2);
     std::string day2 = date.substr(8, 2);
 	std::string yyyymmdd = year2 + month2 + day2;
-	this->data = atof(yyyymmdd.c_str());
+	this->data = atoll(yyyymmdd.c_str());
+	//std::cout << yyyymmdd << " " << yyyymmdd.c_str() << " " << atoll(yyyymmdd.c_str()) << " " << this->data  << "\n";
 	return true;
 }
 
-bool	BitcoinExchange::validate_value(float value)
+bool	BitcoinExchange::validate_value(double value)
 {
 	if (value >= 0 && value <= 1000)
 		return true;
@@ -120,46 +122,54 @@ void	BitcoinExchange::validate_entry_csv(std::string line)
 		std::cout << InvalidValueException() << " => " << v << std::endl;
 		return ;
 	}
-	float	value = static_cast<float>(atof(v.c_str()));
-	data_csv.insert(std::pair<float, float>(this->data, value));
+	double	value = static_cast<double>(atof(v.c_str()));
+	data_csv.insert(std::pair<double, double>(this->data, value));
 }
 
-void	BitcoinExchange::validate_entry_txt(std::string line)
+bool	BitcoinExchange::validate_entry_txt(std::string line)
 {
 	unsigned long	pos = line.find(" | ");
 	if (pos != 10 || pos + 3 >= line.length())
 	{
 		std::cout << InvalidFormatException() << " => " << line << std::endl;
-		return ;
+		return false;
 	}
 	std::string	date = line.substr(0, pos);
 	if (!validate_date(date))
 	{
 		std::cout << InvalidDateException() << " => " << date << std::endl;
-		return ;
+		return false;
 	}
-	float	value = static_cast<float>(atof(line.substr(pos + 3).c_str()));
+	double	value = static_cast<double>(atof(line.substr(pos + 3).c_str()));
 
 	if (!validate_value(value))
 	{
 		std::cout << InvalidValueException() <<  " => " << value << std::endl;
-		return ;
+		return false;
 	}
 	find_nearest_date(date, value);
+	return true;
 }
 
-void	BitcoinExchange::find_nearest_date(std::string date, float value)
+void	BitcoinExchange::find_nearest_date(std::string date, double value)
 {
 	if (data_csv.find(data) != data_csv.end())
 		std::cout << date  << " => " << value << " = " << value * data_csv.find(data)->second << std::endl;
 	else
 	{
-		std::multimap<float, float>::iterator it2 = data_csv.end();
-		for(std::multimap<float, float>::iterator it = data_csv.begin(); it != data_csv.end(); it++)
+		std::multimap<long long, double>::iterator it2 = data_csv.begin();
+		for(std::multimap<long long, double>::iterator it = data_csv.begin(); it != data_csv.end(); it++)
+		{
+			if (it->first > data)
+				break;
+			it2 = it;
+		}
+		/*std::multimap<long long, double>::iterator it2 = data_csv.end();
+		for(std::multimap<long long, double>::iterator it = data_csv.begin(); it != data_csv.end(); it++)
 		{
 			if (std::abs(it->first - data) < std::abs(it2->first - data))
 				it2 = it;
-		}
+		}*/
 		std::cout << date  << " => " << value << " = " << value * it2->second << std::endl;
 	}
 }
