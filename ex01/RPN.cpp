@@ -38,13 +38,13 @@ void	RPN::trim(char *str)
 		if (token.length() > 1)
 		{
 
-			std::cout << "Error\n";
+			std::cerr << "Error\n";
 			return ;
 		}
 		if ((token[0] < '0' || token[0] > '9') && token[0] != '-' && token[0] != '+'
 			&& token[0] != '/' && token[0] != '*')
 		{
-			std::cout << "Error\n";
+			std::cerr << "Error\n";
 			return ;
 		}
 		else
@@ -56,7 +56,7 @@ void	RPN::trim(char *str)
 				operations(token[0]);
 			else
 			{
-				std::cout << "Error\n";
+				std::cerr << "Error\n";
 				return ;
 			}
 
@@ -65,7 +65,7 @@ void	RPN::trim(char *str)
 	}
 	if (input.size() > 1)
 	{
-		std::cout << "Error\n";
+		std::cerr << "Error\n";
 		return ;
 	}
 	else
@@ -86,7 +86,7 @@ void	RPN::operations(char op)
 		case '/':
 			if (v2 == 0)
 			{
-				std::cout << "Error\n";
+				std::cerr << "Error\n";
 				exit(1);
 			}
 			else

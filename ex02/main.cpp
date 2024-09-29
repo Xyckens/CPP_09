@@ -4,11 +4,11 @@ int	main(int argc, char **argv)
 {
 	if (argc == 1)
 	{
-		std::cout << "No arguments provided.\n";
+		std::cerr << "No arguments provided.\n";
 	}
 	else if (argc == 2)
 	{
-		std::cout << "Bruh...\n";
+		std::cerr << "Bruh...\n";
 	}
 	else
 	{
